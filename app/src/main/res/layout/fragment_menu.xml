@@ -5,7 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".model.MenuFragment">
+    tools:context=".view.MenuFragment">
+
+    <ImageView
+        android:id="@+id/userImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_background" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -46,5 +54,36 @@
             android:textSize="18sp"
             android:padding="4dp" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_add_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="добавить текстовый файл" />
+
+    <Button
+        android:id="@+id/btn_show_files"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Посмотерть файлы" />
+
+    <TextView
+        android:id="@+id/fileListTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <Button
+        android:id="@+id/btn_sign_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Выход"/>
 
 </LinearLayout>

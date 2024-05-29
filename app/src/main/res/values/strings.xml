@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">GoogleDriveApp</string>
     <string name="default_web_client_id">551533910761-fkn0efdnn4242aeuql2tcju4neqjsqj2.apps.googleusercontent.com</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_app">Google Drive Client</string>
+    <string name="title_login_google">Sign In</string>
 </resources>

@@ -10,16 +10,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
+import com.google.api.services.drive.DriveScopes
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var firebaseAuth: FirebaseAuth  // Инициализация Firebase аутентификации
+    private lateinit var googleSignInClient: GoogleSignInClient  // Инициализация клиента для входа через Google
 
-    private val reqCode:Int=123
+    private val reqCode: Int = 123  // Код запроса для Google Sign-In
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,68 +31,73 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Получение экземпляра FirebaseAuth
         firebaseAuth = FirebaseAuth.getInstance()
 
+        // Настройка опций для входа через Google
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
+            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
             .build()
-        mGoogleSignInClient= GoogleSignIn.getClient(this,gso)
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        binding.signIn.setOnClickListener{
-            Toast.makeText(this,"Logging In", Toast.LENGTH_SHORT).show()
+        // Кнопка для прохождения авторизации
+        binding.signIn.setOnClickListener {
+            Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
             signInWithGoogle()
         }
 
-        val currentUser = firebaseAuth.currentUser
-        if (currentUser != null) {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("email", currentUser.email)
-                putExtra("name", currentUser.displayName)
-            }
-            startActivity(intent)
-            finish()
+        // Проверка, есть ли текущий пользователь, и перенаправление при успешном входе
+        firebaseAuth.currentUser?.let {
+            successfulLogin()
         }
     }
 
-    private fun signInWithGoogle(){
-        val signInIntent: Intent = mGoogleSignInClient.signInIntent
-        startActivityForResult(signInIntent,reqCode)
+    // Метод для инициирования процесса входа через Google
+    private fun signInWithGoogle() {
+        val signInIntent: Intent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, reqCode)
     }
 
+    // Обработка результата активности для входа через Google
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode==reqCode){
+        if (requestCode == reqCode) {
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleResult(task)
         }
     }
 
-
-    private fun handleResult(completedTask: Task<GoogleSignInAccount>){
+    // Обработка результата задачи входа через Google
+    private fun handleResult(completedTask: Task<GoogleSignInAccount>) {
         try {
-            val account: GoogleSignInAccount? =completedTask.getResult(ApiException::class.java)
-            if (account != null) {
-                updateUI(account)
-            }
-        } catch (e: ApiException){
-            Toast.makeText(this,e.toString(), Toast.LENGTH_SHORT).show()
+            val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
+            account?.let { updateUI(it) }
+        } catch (e: ApiException) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun updateUI(account: GoogleSignInAccount){
-        val credential= GoogleAuthProvider.getCredential(account.idToken,null)
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener {task->
-            if(task.isSuccessful) {
-                //account.email.toString() <--- the user's email
-                //account.displayName.toString()) <--- the user's name
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    putExtra("email", account.email.toString())
-                    putExtra("name", account.displayName.toString())
-                }
+    // Обновление UI и Firebase аутентификация с использованием учетных данных Google
+    private fun updateUI(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        //Если аутентификация прошла успешна, то пользователь переходит в MainActivity
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
+            } else {
+                Toast.makeText(this, "Authentication Failed.", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    // Метод для обработки успешного входа пользователя
+    private fun successfulLogin() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
