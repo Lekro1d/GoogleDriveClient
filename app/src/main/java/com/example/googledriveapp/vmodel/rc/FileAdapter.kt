@@ -1,9 +1,10 @@
-package com.example.googledriveapp
+package com.example.googledriveapp.vmodel.rc
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.googledriveapp.R
 import com.example.googledriveapp.databinding.RcItemFileBinding
 import com.google.api.services.drive.model.File
 

@@ -4,4 +4,11 @@
 
     <string name="title_app">Google Drive Client</string>
     <string name="title_login_google">Sign In</string>
+
+    <string name="edit_hint_title">Название</string>
+    <string name="edit_hint_desc">Содержимое</string>
+
+    <string name="acc_signout">Выйти</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

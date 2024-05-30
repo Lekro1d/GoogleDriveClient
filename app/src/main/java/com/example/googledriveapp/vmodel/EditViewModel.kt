@@ -1,19 +1,11 @@
 package com.example.googledriveapp.vmodel
 
-import android.app.Application
 import android.content.Context
-import android.net.Uri
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.googledriveapp.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.Scope
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.ByteArrayContent
@@ -21,16 +13,12 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MenuViewModel: ViewModel() {
+class EditViewModel: ViewModel() {
     private lateinit var driveService: Drive
-
-    private val _files = MutableLiveData<List<com.google.api.services.drive.model.File>>()
-    val files: LiveData<List<com.google.api.services.drive.model.File>> get() = _files
 
     fun googleDriveService(context: Context) {
         GoogleSignIn.getLastSignedInAccount(context)?.let { googleAccount ->
@@ -53,9 +41,10 @@ class MenuViewModel: ViewModel() {
         }
     }
     //!!
-    fun listFiles(context: Context) {
+    fun uploadTextFile(fileName: String, fileContent: String, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Убедитесь, что driveService инициализирован
                 if (!::driveService.isInitialized) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Drive service not initialized", Toast.LENGTH_SHORT).show()
@@ -63,18 +52,27 @@ class MenuViewModel: ViewModel() {
                     return@launch
                 }
 
-                val result = driveService.files().list()
-                    .setFields("files(id, name, mimeType)")
+                val fileMetadata = File().apply {
+                    name = fileName
+                    mimeType = "text/plain"
+                }
+
+                val fileContentStream = ByteArrayContent.fromString("text/plain", fileContent)
+
+                val driveFile = driveService.files().create(fileMetadata, fileContentStream)
+                    .setFields("id")
                     .execute()
 
-                val files = result.files ?: emptyList()
-
                 withContext(Dispatchers.Main) {
-                    _files.value = files
+                    if (driveFile != null) {
+                        Toast.makeText(context, "File ID: ${driveFile.id}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Failed to upload file", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Error retrieving files: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Error uploading file: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }

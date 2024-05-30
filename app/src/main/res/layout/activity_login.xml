@@ -7,7 +7,7 @@
     android:padding="40dp"
     android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".LoginActivity">
+    tools:context=".view.activity.LoginActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
         android:src="@drawable/login_title"
         android:contentDescription="@string/title_app" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sign_in"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
