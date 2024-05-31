@@ -8,7 +8,6 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingBottom="16dp"
-    android:background="@drawable/account_background"
     android:orientation="vertical"
     tools:context=".view.fragments.AccountFragment">
 

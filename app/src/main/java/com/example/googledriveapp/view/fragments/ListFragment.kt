@@ -1,27 +1,25 @@
 package com.example.googledriveapp.view.fragments
 
-import android.media.RouteListingPreference
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.googledriveapp.vmodel.rc.FileAdapter
+import com.example.googledriveapp.vmodel.rc.ListFileAdapter
 import com.example.googledriveapp.databinding.FragmentMenuBinding
-import com.example.googledriveapp.vmodel.MenuViewModel
+import com.example.googledriveapp.vmodel.ListViewModel
 import com.google.api.services.drive.model.File
 import java.util.Locale
 
-class MenuFragment : Fragment() {
+class ListFragment : Fragment() {
     private var _binding: FragmentMenuBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: MenuViewModel
+    private lateinit var viewModel: ListViewModel
 
-    private lateinit var fileAdapter: FileAdapter
+    private lateinit var fileAdapter: ListFileAdapter
 
     private lateinit var searchView: SearchView
     private var allFiles = ArrayList<com.google.api.services.drive.model.File>()
@@ -34,14 +32,14 @@ class MenuFragment : Fragment() {
         _binding = FragmentMenuBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        viewModel = ViewModelProvider(this).get(MenuViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ListViewModel::class.java)
 
         viewModel.googleDriveService(requireContext())
 
         //слушатель на каждый элемент recycler view
-        fileAdapter = FileAdapter(object : FileAdapter.ListenerFile {
+        fileAdapter = ListFileAdapter(object : ListFileAdapter.ListenerFile {
             override fun onClickFileItem(file: File) {
-                //
+                viewModel.downloadFile(requireContext(), file)
             }
         })
 

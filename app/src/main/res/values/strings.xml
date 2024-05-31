@@ -8,6 +8,17 @@
     <string name="edit_hint_title">Название</string>
     <string name="edit_hint_desc">Содержимое</string>
 
+    <string name="upload_media">Фото или видео</string>
+    <string name="upload_files">Файл</string>
+    <string name="upload_camera">Камера</string>
+
+    <string name="select_title">Выберите</string>
+
+    <string name="menu_list">Список</string>
+    <string name="menu_upload">Загрузить</string>
+    <string name="menu_account">Аккаунт</string>
+    <string name="menu_help">Помощь</string>
+
     <string name="acc_signout">Выйти</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

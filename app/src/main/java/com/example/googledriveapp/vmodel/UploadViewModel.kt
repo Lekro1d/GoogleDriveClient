@@ -1,6 +1,7 @@
 package com.example.googledriveapp.vmodel
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +9,7 @@ import com.example.googledriveapp.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.http.ByteArrayContent
+import com.google.api.client.http.InputStreamContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
@@ -17,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class EditViewModel: ViewModel() {
+class UploadViewModel: ViewModel() {
     private lateinit var driveService: Drive
 
     fun googleDriveService(context: Context) {
@@ -41,10 +42,9 @@ class EditViewModel: ViewModel() {
         }
     }
     //!!
-    fun uploadTextFile(fileName: String, fileContent: String, context: Context) {
+    fun uploadImageFile(fileUri: Uri, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Убедитесь, что driveService инициализирован
                 if (!::driveService.isInitialized) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Drive service not initialized", Toast.LENGTH_SHORT).show()
@@ -52,14 +52,17 @@ class EditViewModel: ViewModel() {
                     return@launch
                 }
 
+                val contentResolver = context.contentResolver
+                val mimeType = contentResolver.getType(fileUri)
+                val inputStream = contentResolver.openInputStream(fileUri)
                 val fileMetadata = File().apply {
-                    name = fileName
-                    mimeType = "text/plain"
+                    name = fileUri.lastPathSegment
+                    this.mimeType = mimeType
                 }
 
-                val fileContentStream = ByteArrayContent.fromString("text/plain", fileContent)
+                val mediaContent = InputStreamContent(mimeType, inputStream)
 
-                val driveFile = driveService.files().create(fileMetadata, fileContentStream)
+                val driveFile = driveService.files().create(fileMetadata, mediaContent)
                     .setFields("id")
                     .execute()
 
