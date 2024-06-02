@@ -2,6 +2,7 @@ package com.example.googledriveapp.vmodel
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,8 +56,11 @@ class UploadViewModel: ViewModel() {
                 val contentResolver = context.contentResolver
                 val mimeType = contentResolver.getType(fileUri)
                 val inputStream = contentResolver.openInputStream(fileUri)
+
+                val fileName = getFileName(fileUri, context) ?: fileUri.lastPathSegment
+
                 val fileMetadata = File().apply {
-                    name = fileUri.lastPathSegment
+                    name = fileName
                     this.mimeType = mimeType
                 }
 
@@ -79,5 +83,20 @@ class UploadViewModel: ViewModel() {
                 }
             }
         }
+    }
+
+    private fun getFileName(uri: Uri, context: Context): String? {
+        var name: String? = null
+        val contentResolver = context.contentResolver
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1) {
+                    name = it.getString(nameIndex)
+                }
+            }
+        }
+        return name
     }
 }

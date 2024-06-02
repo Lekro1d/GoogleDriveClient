@@ -44,8 +44,12 @@ class UploadFragment : Fragment() {
         binding.btnUpload.setOnClickListener {
             files?.forEach { fileUri ->
                 viewModel.uploadImageFile(fileUri, requireContext())
-                findNavController().navigate(R.id.action_uploadFragment_to_menuFragment)
             }
+            binding.btnBack.visibility = View.VISIBLE
+        }
+
+        binding.btnBack.setOnClickListener {
+            findNavController().navigate(R.id.action_uploadFragment_to_menuFragment)
         }
 
         return view

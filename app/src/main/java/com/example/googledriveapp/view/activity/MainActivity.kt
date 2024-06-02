@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         with(dialog) {
             findViewById<LinearLayout>(R.id.layoutFiles).setOnClickListener {
                 dismiss()
-                checkStoragePermission()
+                openFileChooser()
             }
 
             findViewById<LinearLayout>(R.id.layoutMedia).setOnClickListener {
@@ -92,50 +92,30 @@ class MainActivity : AppCompatActivity() {
 
     // Метод для открытия выборщика файлов
     private fun openFileChooser() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "*/*" // Установка типа для выборщика файлов
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true) // Разрешение множественного выбора
-        startActivityForResult(Intent.createChooser(intent, "Select File"), FILE_SELECT_CODE) // Запуск выборщика файлов с интентом выбора
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "*/*"
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        startActivityForResult(intent, FILE_SELECT_CODE)
     }
 
-    // Переопределение метода для получения результата из другой активности
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_SELECT_CODE && resultCode == Activity.RESULT_OK) {
             val files = mutableListOf<Uri>()
-            if (data?.clipData != null) {
-                val count = data.clipData!!.itemCount
-                for (i in 0 until count) {
-                    files.add(data.clipData!!.getItemAt(i).uri)
-                }
-            } else if (data?.data != null) {
-                files.add(data.data!!)
+            data?.data?.let { uri ->
+                files.add(uri)
             }
-            val bundle = Bundle()
-            bundle.putParcelableArrayList("selected_files", ArrayList(files))
+            data?.clipData?.let { clipData ->
+                for (i in 0 until clipData.itemCount) {
+                    files.add(clipData.getItemAt(i).uri)
+                }
+            }
+            val bundle = Bundle().apply {
+                putParcelableArrayList("selected_files", ArrayList(files))
+            }
             val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             navHostFragment.navController.navigate(R.id.uploadFragment, bundle)
-        }
-    }
-
-    // Метод для проверки разрешения на чтение из хранилища
-    private fun checkStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE)
-        } else {
-            openFileChooser()
-        }
-    }
-
-    // Переопределение метода для обработки результата запроса разрешения
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openFileChooser()
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 }
