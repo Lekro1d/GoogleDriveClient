@@ -84,9 +84,7 @@ class LoginActivity : AppCompatActivity() {
         //Если аутентификация прошла успешна, то пользователь переходит в MainActivity
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
+                successfulLogin()
             } else {
                 Toast.makeText(this, "Authentication Failed.", Toast.LENGTH_SHORT).show()
             }

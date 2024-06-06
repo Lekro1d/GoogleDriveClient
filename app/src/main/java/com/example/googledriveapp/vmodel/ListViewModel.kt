@@ -69,7 +69,7 @@ class ListViewModel: ViewModel() {
                 }
 
                 val result = driveService.files().list()
-                    .setFields("files(id, name, mimeType, webViewLink, thumbnailLink)")
+                    .setFields("files(id, name, mimeType, webViewLink, thumbnailLink, size, createdTime)")
                     .execute()
 
                 val files = result.files ?: emptyList()
@@ -84,7 +84,7 @@ class ListViewModel: ViewModel() {
             }
         }
     }
-
+    //Функция скачивания файла из Google Drive
     fun downloadFile(context: Context, file: com.google.api.services.drive.model.File) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -126,5 +126,23 @@ class ListViewModel: ViewModel() {
     private fun getMimeType(fileName: String): String {
         val extension = fileName.substringAfterLast('.', "")
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "application/octet-stream"
+    }
+    //Функция удаления файла из Google Drive
+    fun deleteFile(context: Context, file: com.google.api.services.drive.model.File) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                driveService.files().delete(file.id).execute()
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "File deleted: ${file.name}", Toast.LENGTH_SHORT).show()
+                    // Обновление список файлов после удаления
+                    listFiles(context)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Error deleting file: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

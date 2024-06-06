@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.googledriveapp.vmodel.rc.ListFileAdapter
 import com.example.googledriveapp.databinding.FragmentMenuBinding
 import com.example.googledriveapp.vmodel.ListViewModel
+import com.example.googledriveapp.vmodel.rc.SwipeToDeleteCallback
 import com.google.api.services.drive.model.File
 import java.util.Locale
 
@@ -36,18 +38,15 @@ class ListFragment : Fragment() {
 
         viewModel.googleDriveService(requireContext())
 
-        //слушатель на каждый элемент recycler view
         fileAdapter = ListFileAdapter(object : ListFileAdapter.ListenerFile {
-            override fun onClickFileItem(file: File) {
-                viewModel.downloadFile(requireContext(), file)
+            override fun onClickFileItem(file: File, position: Int) {
+                fileAdapter.toggleExpansion(position)
             }
         })
 
-        //инициализация recyclerview
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = fileAdapter
 
-        //вывести все файлы из google drive
         viewModel.listFiles(requireContext())
 
         viewModel.files.observe(viewLifecycleOwner) { files ->
@@ -57,6 +56,23 @@ class ListFragment : Fragment() {
         }
 
         setupSearchView()
+
+        val swipeCallback = SwipeToDeleteCallback(object : SwipeToDeleteCallback.SwipeListener {
+            override fun onItemSwipedLeft(position: Int) {
+                val file = fileAdapter.getFileAtPosition(position)
+                viewModel.downloadFile(requireContext(), file)
+                fileAdapter.notifyItemChanged(position)
+            }
+
+            override fun onItemSwipedRight(position: Int) {
+                val file = fileAdapter.getFileAtPosition(position)
+                viewModel.deleteFile(requireContext(), file)
+                fileAdapter.removeFileAtPosition(position)
+            }
+        })
+
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
         return view
     }
