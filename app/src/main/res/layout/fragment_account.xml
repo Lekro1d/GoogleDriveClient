@@ -9,7 +9,7 @@
     android:paddingEnd="16dp"
     android:paddingBottom="16dp"
     android:orientation="vertical"
-    tools:context=".view.fragments.AccountFragment">
+    tools:context=".presentation.view.fragments.AccountFragment">
 
     <ImageView
         android:id="@+id/userImageView"

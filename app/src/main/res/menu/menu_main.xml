@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuFragment"
+        android:title="@string/menu_list"
+        android:icon="@drawable/menu_list_ic"/>
+
+    <item
+        android:title=""/>
+
+    <item
+        android:id="@+id/accountFragment"
+        android:title="@string/menu_account"
+        android:icon="@drawable/menu_account_ic" />
+
+</menu>

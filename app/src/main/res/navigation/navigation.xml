@@ -6,30 +6,27 @@
     app:startDestination="@id/menuFragment">
 
     <fragment
-        android:id="@+id/menuFragment"
-        android:name="com.example.googledriveapp.view.fragments.ListFragment"
-        android:label="fragment_menu"
-        tools:layout="@layout/fragment_menu" >
-        <argument
-            android:name="name"
-            app:argType="string" />
-        <argument
-            android:name="email"
-            app:argType="string" />
+        android:id="@+id/accountFragment"
+        android:name="com.example.googledriveapp.presentation.view.fragments.AccountFragment"
+        android:label="fragment_account"
+        tools:layout="@layout/fragment_account" >
+        <action
+            android:id="@+id/action_accountFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
     </fragment>
     <fragment
-        android:id="@+id/accountFragment"
-        android:name="com.example.googledriveapp.view.fragments.AccountFragment"
-        android:label="fragment_account"
-        tools:layout="@layout/fragment_account" />
-    <fragment
         android:id="@+id/uploadFragment"
-        android:name="com.example.googledriveapp.view.fragments.UploadFragment"
+        android:name="com.example.googledriveapp.presentation.view.fragments.UploadFragment"
         android:label="fragment_edit"
         tools:layout="@layout/fragment_upload" >
         <action
             android:id="@+id/action_uploadFragment_to_menuFragment"
             app:destination="@id/menuFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.example.googledriveapp.presentation.view.fragments.MenuFragment"
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu" />
 
 </navigation>

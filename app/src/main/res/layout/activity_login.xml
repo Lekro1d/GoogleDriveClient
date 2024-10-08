@@ -7,7 +7,7 @@
     android:padding="40dp"
     android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".view.activity.LoginActivity">
+    tools:context=".presentation.view.activity.LoginActivity">
 
     <TextView
         android:layout_width="match_parent"
